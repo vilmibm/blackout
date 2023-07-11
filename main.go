@@ -35,6 +35,7 @@ type chunk struct {
 
 func main() {
 	r := gin.Default()
+	r.LoadHTMLFiles("templates/index.tmpl")
 
 	randMax := big.NewInt(maxID)
 
@@ -68,7 +69,7 @@ func main() {
 			c.String(http.StatusInternalServerError, "oh no.")
 		}
 
-		c.String(http.StatusOK, "%s\n\n(%s by %s)", dest.Chunk, dest.Name, dest.Author)
+		c.HTML(http.StatusOK, "index.tmpl", dest)
 	})
 	r.Run() // 8080
 }
