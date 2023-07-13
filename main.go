@@ -4,6 +4,8 @@ import (
 	"log"
 	"math/big"
 	"net/http"
+	"regexp"
+	"strings"
 
 	"crypto/rand"
 	"database/sql"
@@ -29,6 +31,7 @@ func connectDB() (*sql.DB, error) {
 
 type chunk struct {
 	Chunk  string
+	Tokens []string
 	Name   string
 	Author string
 }
@@ -38,6 +41,8 @@ func main() {
 	r.LoadHTMLFiles("templates/index.tmpl")
 
 	randMax := big.NewInt(maxID)
+
+	spaceRE := regexp.MustCompile(`[\t\v\f\r ]+`)
 
 	r.GET("/", func(c *gin.Context) {
 		db, err := connectDB()
@@ -67,6 +72,25 @@ func main() {
 		if err != nil {
 			log.Println(err.Error())
 			c.String(http.StatusInternalServerError, "oh no.")
+		}
+
+		dest.Tokens = []string{}
+		for _, t := range spaceRE.Split(dest.Chunk, -1) {
+			if t == "" {
+				continue
+			}
+			if strings.Contains(t, "\n") {
+				sp := strings.Split(t, "\n")
+				for x, s := range sp {
+					nl := "\n"
+					if x == len(sp)-1 {
+						nl = ""
+					}
+					dest.Tokens = append(dest.Tokens, s+nl)
+				}
+			} else {
+				dest.Tokens = append(dest.Tokens, t)
+			}
 		}
 
 		c.HTML(http.StatusOK, "index.tmpl", dest)

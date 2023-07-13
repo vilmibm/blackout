@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>blackout engine</title>
+</head>
+<body>
+  <style>
+    body {
+      background-color: black;
+    }
+
+    .centering {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: left;
+      min-height: 95vh;
+      margin-left: 25%;
+      width: 50%;
+    }
+
+    #paper {
+      background-color: white;
+      padding: 2em;
+      font-size: 150%;
+    }
+
+    .data {
+      display: none;
+    }
+
+    .black {
+      background-color: black;
+    }
+
+    #paper span:hover {
+      background-color: white;
+    }
+  </style>
+  <div class="centering">
+    <div id="paper">
+      {{- range .Tokens -}}
+        <span class="black"> {{.}} </span>
+      {{- end -}}
+    </div>
+    <script>
+      document.querySelectorAll("#paper span").forEach(span =>
+        span.onclick = () => span.classList.toggle("black")
+      );
+    </script>
+  </div>
+  <div class="data" id="chunk">{{.Chunk}}</div>
+  <div class="data" id="bookTitle">{{.Name}}</div>
+  <div class="data" id="bookAuthor">{{.Author}}</div>
+</body>
+</html>
