@@ -1,6 +1,7 @@
 package main
 
 import (
+	"html/template"
 	"log"
 	"math/big"
 	"net/http"
@@ -29,7 +30,9 @@ func connectDB() (*sql.DB, error) {
 	return db, nil
 }
 
-type chunk struct {
+type payload struct {
+	ID     int64
+	MaxID  int
 	Chunk  string
 	Tokens []string
 	Name   string
@@ -38,7 +41,11 @@ type chunk struct {
 
 func main() {
 	r := gin.Default()
+	r.SetFuncMap(template.FuncMap{
+		"upper": strings.ToUpper,
+	})
 	r.LoadHTMLFiles("templates/index.tmpl")
+	r.StaticFile("/favicon.ico", "./assets/favicon.ico")
 
 	randMax := big.NewInt(maxID)
 
@@ -67,12 +74,19 @@ func main() {
 		}
 
 		row := stmt.QueryRow(id.Int64())
-		var dest chunk
+		var dest payload
 		err = row.Scan(&dest.Chunk, &dest.Name, &dest.Author)
 		if err != nil {
 			log.Println(err.Error())
 			c.String(http.StatusInternalServerError, "oh no.")
 		}
+
+		if dest.Author == "" {
+			dest.Author = "Unknown"
+		}
+
+		dest.MaxID = maxID
+		dest.ID = id.Int64()
 
 		dest.Tokens = []string{}
 		for _, t := range spaceRE.Split(dest.Chunk, -1) {

@@ -8,15 +8,45 @@
     body {
       background-color: black;
     }
+    .rainbow {
+      animation-name: rainbow;
+      animation-duration: 1s;
+    }
+    @keyframes rainbow {
+      20%{color: red;}
+      40%{color: orange;}
+      60%{color: yellow;}
+      80%{color: green;}
+      100%{color: blue;}
+    }
 
     .centering {
       display: flex;
       justify-content: center;
       align-items: center;
       text-align: left;
-      min-height: 95vh;
       margin-left: 25%;
+      margin-bottom: 4em;
+      margin-top: 4em;
       width: 50%;
+    }
+
+    .black {
+      background-color: black;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .citation {
+      font-weight: bold;
+      font-style: oblique;
+      font-variant-caps: small-caps;
+    }
+
+    .from {
+      color: white;
     }
 
     #paper {
@@ -25,16 +55,28 @@
       font-size: 150%;
     }
 
-    .data {
-      display: none;
-    }
-
-    .black {
-      background-color: black;
+    #paper span {
+      cursor: help;
     }
 
     #paper span:hover {
       background-color: white;
+    }
+
+    #aboutToggle {
+      color: white;
+      font-weight: bold;
+      font-style: oblique;
+      text-decoration: underline;
+    }
+
+    #about {
+      color: white;
+      font-family: arial;
+    }
+
+    #about a:visited {
+      color: white;
     }
   </style>
   <div class="centering">
@@ -43,14 +85,73 @@
         <span class="black"> {{.}} </span>
       {{- end -}}
     </div>
-    <script>
-      document.querySelectorAll("#paper span").forEach(span =>
-        span.onclick = () => span.classList.toggle("black")
-      );
-    </script>
   </div>
-  <div class="data" id="chunk">{{.Chunk}}</div>
-  <div class="data" id="bookTitle">{{.Name}}</div>
-  <div class="data" id="bookAuthor">{{.Author}}</div>
+  <!--
+  I have chosen to keep the source hidden behind the ABOUT toggle. I want
+  people to have the choice of engaging with the text without preconceived
+  notions.
+
+  <p class="from">
+    &mdash;from <em>{{.Name}}</em> by <em>{{.Author}}</em>
+  </p>
+  -->
+  <center>
+    <p>
+      <button id="copy">copy to clipboard</button>
+    </p>
+    <p>
+      <a id="aboutToggle" href="">ABOUT</a>
+    </p>
+    <div id="about" class="hidden">
+      <p>
+        THIS WEB SITE ALLOWS YOU TO PERFORM A KIND OF FOUND POETRY CREATION CALLED <a href="https://www.thehistoryofblackoutpoetry.org/">BLACKOUT POETRY</a>.
+      </p>
+      <p>
+        THE TEXT ABOVE IS EXCERPTED FROM <span class="citation">{{.Name}}</span> BY <span class="citation">{{.Author}}</span> AS IT EXISTS ON <a href="https://www.gutenberg.org/">PROJECT GUTENBERG</a>. 
+      </p>
+      <p>
+        IT IS <strong>#{{.ID}}</strong> OUT OF <strong>{{.MaxID}}</strong> POSSIBLE TEXT CHUNKS. RELOAD FOR ANOTHER.
+      </p>
+      <p>
+        THIS IS A PROJECT BY <a href="https://tilde.town/~vilmibm">~VILMIBM</a>.
+      </p>
+    </div>
+  </center>
+  <script>
+    document.querySelectorAll("#paper span").forEach(span =>
+      span.onclick = () => span.classList.toggle("black"));
+    document.querySelector("#aboutToggle").onclick = (e) => {
+      e.preventDefault();
+      document.querySelector("#about").classList.toggle("hidden");
+    }
+    const copyButton = document.querySelector("#copy");
+    copyButton.addEventListener("animationend", () => copyButton.classList.remove("rainbow"), false);
+    copyButton.onclick = (e) => {
+      let toCopy = "";
+      document.querySelectorAll("#paper span").forEach(span => {
+        let guts = span.innerHTML;
+        let out = "";
+        if (span.classList.contains("black")) {
+          for (let i = 0; i < guts.length; i++) {
+            if (guts[i] == "\n") {
+              out += "\n";
+            } else {
+              out += "█";
+            }
+          }
+        } else {
+          out = guts;
+        }
+
+        toCopy += out;
+      });
+
+      navigator.clipboard.writeText(toCopy).then(() => {
+        copyButton.classList.add("rainbow");
+      }, (err) => {
+        console.log(err);
+      });
+    }
+  </script>
 </body>
 </html>
