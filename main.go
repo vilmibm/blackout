@@ -50,6 +50,9 @@ func main() {
 	randMax := big.NewInt(maxID)
 
 	spaceRE := regexp.MustCompile(`[\t\v\f\r ]+`)
+	r.HEAD("/", func(c *gin.Context) {
+		c.String(http.StatusOK, "")
+	})
 
 	r.GET("/", func(c *gin.Context) {
 		db, err := connectDB()
