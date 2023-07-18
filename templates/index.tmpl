@@ -102,7 +102,7 @@
   -->
   <center>
     <p>
-      <button id="copy">copy to clipboard</button>
+      <button id="copy">copy text to clipboard</button>
     </p>
     <p>
       <a id="aboutToggle" href="">ABOUT</a>
@@ -135,6 +135,18 @@
       let toCopy = "";
       document.querySelectorAll("#paper span").forEach(span => {
         let guts = span.innerHTML;
+        if (!span.classList.contains("black")) {
+          toCopy += guts.trim()+" ";
+        }
+        if (guts.includes("\n") && toCopy[toCopy.length-1] != "\n") {
+          toCopy += "\n"
+        }
+
+        /*
+        // I think this method of converting to plaintext is interesting but
+        // it's not very practical--it's way too many characters to
+        // realistically put in a toot or alt text or similar. I may add a
+        // "copy wide text" button that re-introduces this behavior.
         let out = "";
         if (span.classList.contains("black")) {
           for (let i = 0; i < guts.length; i++) {
@@ -147,8 +159,8 @@
         } else {
           out = guts;
         }
-
-        toCopy += out;
+        toCopy += out
+        */
       });
 
       navigator.clipboard.writeText(toCopy).then(() => {
