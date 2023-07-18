@@ -61,6 +61,7 @@ func main() {
 			c.String(http.StatusInternalServerError, "oh no.")
 			return
 		}
+		defer db.Close()
 
 		id, err := rand.Int(rand.Reader, randMax)
 		if err != nil {
