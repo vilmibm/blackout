@@ -46,6 +46,7 @@ func main() {
 	})
 	r.LoadHTMLFiles("templates/index.tmpl")
 	r.StaticFile("/favicon.ico", "./assets/favicon.ico")
+	r.StaticFile("/html2canvas.min.js", "./assets/html2canvas.min.js")
 
 	randMax := big.NewInt(maxID)
 

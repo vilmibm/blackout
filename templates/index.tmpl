@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>blackout engine</title>
+  <script src="/html2canvas.min.js"></script>
 </head>
 <body>
   <style>
@@ -102,7 +103,10 @@
   -->
   <center>
     <p>
-      <button id="copy">copy text to clipboard</button>
+      <button id="copyText">copy text to clipboard</button>
+    </p>
+    <p>
+      <button id="copyImage" class="hidden">copy image to clipboard</button>
     </p>
     <p>
       <a id="aboutToggle" href="">ABOUT</a>
@@ -132,9 +136,21 @@
       e.preventDefault();
       document.querySelector("#about").classList.toggle("hidden");
     }
-    const copyButton = document.querySelector("#copy");
-    copyButton.addEventListener("animationend", () => copyButton.classList.remove("rainbow"), false);
-    copyButton.onclick = (e) => {
+    const copyImgButton = document.querySelector("#copyImage");
+    copyImgButton.addEventListener("animationend", () => copyImgButton.classList.remove("rainbow"), false);
+    copyImgButton.onclick = () => {
+      html2canvas(document.querySelector("#paper")).then((canvas) => {
+        canvas.toBlob((blob) => {
+          let data = [new ClipboardItem({ [blob.type]: blob })];
+          navigator.clipboard.write(data).then(() => {
+            copyImgButton.classList.add("rainbow");
+          }, console.log);
+        });
+      });
+    }
+    const copyTextButton = document.querySelector("#copyText");
+    copyTextButton.addEventListener("animationend", () => copyTextButton.classList.remove("rainbow"), false);
+    copyTextButton.onclick = () => {
       let toCopy = "";
       document.querySelectorAll("#paper span").forEach(span => {
         let guts = span.innerHTML;
@@ -167,7 +183,7 @@
       });
 
       navigator.clipboard.writeText(toCopy).then(() => {
-        copyButton.classList.add("rainbow");
+        copyTextButton.classList.add("rainbow");
       }, (err) => {
         console.log(err);
       });
