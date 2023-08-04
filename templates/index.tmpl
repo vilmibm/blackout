@@ -64,6 +64,9 @@
 
     #paper span {
       cursor: help;
+    }
+
+    .shifted {
       /* hack for the image download. without this, thin white artifacting at span margins */
       margin-left:-1px;
     }
@@ -79,14 +82,10 @@
     @media (hover: hover) {
       #paper span:hover {
         background-color: white;
-        /* hack for the image download. without this, thin white artifacting at span margins */
-        margin-left:-1px;
       }
 
       #paper span.black:hover {
         background-color: grey;
-        /* hack for the image download. without this, thin white artifacting at span margins */
-        margin-left:-1px;
       }
     }
 
@@ -174,7 +173,13 @@
     const downloadImgButton = document.querySelector("#downloadImage");
     downloadImgButton.addEventListener("animationend", () => downloadImgButton.classList.remove("rainbow"), false);
     downloadImgButton.addEventListener("click", () => {
+      document.querySelectorAll("#paper span").forEach(span => {
+        span.classList.add("shifted");
+      })
       html2canvas(document.querySelector("#paper")).then((canvas) => {
+        document.querySelectorAll("#paper span").forEach(span => {
+          span.classList.remove("shifted");
+        })
         canvas.toBlob((blob) => {
         /*
           // can't use this because ff doesn't have support by default for clipboard.write()
