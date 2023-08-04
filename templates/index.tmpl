@@ -64,6 +64,8 @@
 
     #paper span {
       cursor: help;
+      /* hack for the image download. without this, thin white artifacting at span margins */
+      margin-left:-1px;
     }
 
     @media (max-width:400px) {
@@ -77,10 +79,14 @@
     @media (hover: hover) {
       #paper span:hover {
         background-color: white;
+        /* hack for the image download. without this, thin white artifacting at span margins */
+        margin-left:-1px;
       }
 
       #paper span.black:hover {
         background-color: grey;
+        /* hack for the image download. without this, thin white artifacting at span margins */
+        margin-left:-1px;
       }
     }
 
@@ -119,9 +125,7 @@
   <center>
     <p>
       <button id="copyText">copy text to clipboard</button>
-    </p>
-    <p>
-      <button id="copyImage" class="hidden">copy image to clipboard</button>
+      <button id="downloadImage">download as image</button>
     </p>
     <p>
       <a id="aboutToggle" href="">ABOUT</a>
@@ -167,16 +171,25 @@
       document.querySelector("#about").classList.toggle("hidden");
     }
 
-
-    const copyImgButton = document.querySelector("#copyImage");
-    copyImgButton.addEventListener("animationend", () => copyImgButton.classList.remove("rainbow"), false);
-    copyImgButton.addEventListener("click", () => {
+    const downloadImgButton = document.querySelector("#downloadImage");
+    downloadImgButton.addEventListener("animationend", () => downloadImgButton.classList.remove("rainbow"), false);
+    downloadImgButton.addEventListener("click", () => {
       html2canvas(document.querySelector("#paper")).then((canvas) => {
         canvas.toBlob((blob) => {
+        /*
+          // can't use this because ff doesn't have support by default for clipboard.write()
           let data = [new ClipboardItem({ [blob.type]: blob })];
           navigator.clipboard.write(data).then(() => {
             copyImgButton.classList.add("rainbow");
           }, console.log);
+        */
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = downloadUrl;
+        a.download = "blackout.png";
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(downloadUrl);
         });
       });
     });
